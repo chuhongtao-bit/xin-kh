@@ -17,6 +17,12 @@
     },
     methods:{
 
+    },
+    mounted() {
+      //刷新的时候token会消失  重新获取token
+      window.addEventListener("unload",()=>{
+        sessionStorage.setItem("state",JSON.stringify(this.$store.state))
+      })
     }
   }
 </script>

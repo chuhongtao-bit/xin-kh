@@ -209,7 +209,7 @@
           e = (boxEven['0'] == 'touchstart') ? e.touches[0] : e || window.event;
           endX = e.clientX - goX;
           endX = (endX > 0) ? (endX > evenWidth) ? evenWidth : endX : 0;
-          if(endX > evenWidth * 0.7){
+          if(endX > evenWidth * 0.7){//验证百分比70%
             progress.innerText = '松开验证';
             progress.style.backgroundColor = "#66CC66";
           }else{
@@ -290,8 +290,6 @@
       }).catch((error)=>{
 
       })
-
-//});
     }
   }
 </script>

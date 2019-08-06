@@ -27,7 +27,7 @@
                 <el-dropdown-item command="b">退出</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <span ref="userinfo_username">十里平湖</span>
+            <span ref="userinfo_username">淹不死的鱼</span>
             <input ref="userinfo_userid" type="hidden" v-model="userid">
             &nbsp;&nbsp;&nbsp;
             <el-dropdown trigger="click" >

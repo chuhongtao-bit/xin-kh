@@ -68,7 +68,7 @@
           display:'none'
         },
         ruleForm: {
-          username:'zhangsan',
+          username:'kh',
           password:'123456'
         },
         rules: {

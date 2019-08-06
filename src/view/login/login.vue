@@ -279,7 +279,7 @@
       console.log("11111111111111111");
       var _this = this;
       var code = "";
-      //从后台获取滑动验证码
+      //从后台获取滑动验证码1
       //参数 url 访问参数
       this.$axios.post(this.domain.ssoserverpath+'getCode').then((response)=>{
         console.log("2222");

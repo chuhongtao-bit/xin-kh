@@ -62,6 +62,30 @@ axios.interceptors.request.use((config) => {
   return config;
 })
 
+//音频引入
+import yinpin from '../static/tishiyin/tishiyin.mp3'
+import aiya from '../static/tishiyin/aiya.mp3'
+import en from '../static/tishiyin/en.mp3'
+import qingsong from '../static/tishiyin/dahuaxiyou.mp3'
+
+Vue.prototype.playAudio = (id,yinyue) => {
+  let buttonAudio = document.getElementById(id);
+  if(yinyue=="yinpin"){
+    buttonAudio.setAttribute('src',yinpin)
+  }
+  if(yinyue=="en"){
+    buttonAudio.setAttribute('src',en)
+  }
+  if(yinyue=="aiya"){
+    buttonAudio.setAttribute('src',aiya)
+  }
+  if(yinyue=="qingsong"){
+    buttonAudio.setAttribute('src',qingsong)
+  }
+  buttonAudio.play()
+}
+
+
 
 /* eslint-disable no-new */
 new Vue({

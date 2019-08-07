@@ -132,6 +132,7 @@
           this.$axios.post(this.domain.ssoserverpath+"login",par).then((response)=>{
             let respo=response.data;
             if(respo.code==200){
+
               //存储token到vuex中，
               this.$store.state.token=response.data.token
               this.$store.state.userInfo=response.data.result

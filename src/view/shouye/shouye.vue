@@ -199,8 +199,11 @@
        this.webSocketInit();
 
        if(this.$route.query.username!=null&& this.$route.query.username!='undefind'){
+         //gai
+//          this.domain.userinfo.username=this.$route.query.username;
+//          this.domain.userinfo.userid=this.$route.query.userid;
 
-         this.stores.userinfo.username=this.$route.query.username;
+         this.store.userinfo.username=this.$route.query.username;
          this.domain.userinfo.userid=this.$route.query.userid;
 
        }

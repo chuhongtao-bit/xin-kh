@@ -27,7 +27,7 @@
                 <el-dropdown-item command="b">退出</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <span ref="userinfo_username">淹不死的鱼</span>
+            <span ref="userinfo_username">{{this.$store.state.userInfo.userName}}</span>
             <input ref="userinfo_userid" type="hidden" v-model="userid">
             &nbsp;&nbsp;&nbsp;
             <el-dropdown trigger="click" >
@@ -106,7 +106,7 @@
     name: "shouye",
     methods:{
       webSocketInit() {//webSocket初始化，得判断浏览器是否支持WebSocket
-        this.$data.webSocket= new WebSocket(this.domain.webSocketUrl+this.domain.userinfo.userid);
+        this.$data.webSocket= new WebSocket(this.domain.webSocketUrl+this.domain.userinfo.id);
         this.$data.webSocket.onopen=this.openWebSocket;
         this.$data.webSocket.onmessage=this.messageWebSocket;
         this.$data.webSocket.onclose=this.closeWebSocket;
@@ -177,6 +177,8 @@
           }else if(command=="a"){
              //获取一下隐藏域中的用户ID
              let userid= this.$refs.userinfo_userid.value;
+
+
              //到后台后获取用户的信息
              this.$axios.post(this.domain.serverpath+"user/getUserInfo",JSON.stringify({userid:userid})).then((response)=>{
                  //获取用户信息
@@ -195,24 +197,23 @@
     mounted(){
        //登录之后提示
        this.playAudio("yinpin","yinpin");
-       //初始化webSocket
-       this.webSocketInit();
+      console.log("进入首页mounted方法");
+       // todo 初始化webSocket
+       // this.webSocketInit();
 
-       if(this.$route.query.username!=null&& this.$route.query.username!='undefind'){
-         //gai
-//          this.domain.userinfo.username=this.$route.query.username;
-//          this.domain.userinfo.userid=this.$route.query.userid;
-
-         this.store.userinfo.username=this.$route.query.username;
-         this.domain.userinfo.userid=this.$route.query.userid;
-
-       }
-       this.$data.username=this.domain.userinfo.username;
-       this.$data.userid=this.domain.userinfo.userid;
+      //todo 注释掉暂时不知道做啥的
+      // if(this.$route.query.username!=null&& this.$route.query.username!='undefind'){
+      //
+      //    this.store.userinfo.username=this.$route.query.username;
+      //    this.domain.userinfo.userid=this.$route.query.userid;
+      //
+      //  }
+      //  this.$data.username=this.domain.userinfo.username;
+      //  this.$data.userid=this.domain.userinfo.userid;
     },
     destroyed(){
-      //关闭socket
-      this.closeWebSocket();
+      // todo 关闭socket
+      // this.closeWebSocket();
     }
   }
 </script>

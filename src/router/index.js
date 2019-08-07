@@ -8,6 +8,8 @@ import datamenu from '@/view/shouye/datamenu'
 import datamain from '@/view/shouye/datamain'
 import system from '@/view/shouye/system'
 
+//用户列表
+import userlist from '@/view/yonghu/userlist'
 Vue.use(Router)
 
 
@@ -34,7 +36,8 @@ export default new Router({
           path: "/datamain",
           component: datamain,
           children: [
-            {path:'/system',component:system,meta:{require:true}}
+            {path:'/system',component:system,meta:{require:true}},
+            {path:'/userlist',component:userlist,meta:{require:true}}
           ]
         }
       ]

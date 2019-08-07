@@ -1,9 +1,13 @@
 <template>
-  <el-main id="et" :style="{height:wheight+'px','background-color':'#ffebcd'}">
-
+  <el-main id="et" :style="{height:wheight+'px','background-color':'#A9A9A9'}">
       <router-view style="padding: 0px" ></router-view>
 
+
+
+
   </el-main>
+
+
 
 </template>
 

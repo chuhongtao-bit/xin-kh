@@ -129,6 +129,7 @@
           },100)
           //从cookie中取出某一个名称的Cookie的值
           par.codekey=this.Cookies.get("authcode")
+
           this.$axios.post(this.domain.ssoserverpath+"login",par).then((response)=>{
             let respo=response.data;
             if(respo.code==200){
@@ -136,7 +137,8 @@
               //存储token到vuex中，
               this.$store.state.token=response.data.token
               this.$store.state.userInfo=response.data.result
-              window.sessionStorage.setItem("userInfo",JSON.stringify(response.data.result))
+             //todo 注释掉
+              // window.sessionStorage.setItem("userInfo",JSON.stringify(response.data.result))
               //关闭加载窗
               this.$data.percent=100
               //隐藏进度条
@@ -277,13 +279,13 @@
 
     },
     mounted(){
-      console.log("11111111111111111");
+      console.log("进入login mounted方法");
       var _this = this;
       var code = "";
       //从后台获取滑动验证码1
       //参数 url 访问参数
       this.$axios.post(this.domain.ssoserverpath+'getCode').then((response)=>{
-        console.log("2222");
+        console.log("进入login 获得验证码方法");
         code=response.data.result;
         //向浏览器写一个Cookie
         //document.cookie = 'testCookies' + "=" + response.data.token + "; " + -1;

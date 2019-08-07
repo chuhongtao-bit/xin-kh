@@ -14,18 +14,23 @@
                     :title="getMenuName(m1.menuName)"
                     v-for="(m1,mindex) in listMenu" :key="mindex"
                     :index="getIndex(m1.id)">
+
+          <!--一级菜单标题与图标-->
           <template slot="title">
             <i v-if="m1.id==1" class="el-icon-setting"></i>
             <span slot="title">{{m1.menuName}}</span>
           </template>
+
 
           <div v-for="(m2,m2Index) in m1.menuInfoList" :key="m2Index">
             <el-submenu v-if="m2.menuInfoList!=null&&m2.menuInfoList.length > 0" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)" >
               <span slot="title" >{{m2.menuName}}</span>
               <el-menu-item @click="toforPath(m3.url)" v-for="(m3,m3Index) in m2.menuInfoList" :key="m3Index" :index="getIndex(m2.parentId)+'-'+getIndex(m3.parentId)+'-'+getIndex(m3.id)">{{m3.menuName}}</el-menu-item>
             </el-submenu>
-            <el-menu-item v-else @click="toforPath(m2.url)" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)">{{m2.menuName}}</el-menu-item>
+            <el-menu-item v-else  :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)">{{m2.menuName}}</el-menu-item>
           </div>
+
+
         </el-submenu>
     </el-menu>
     </div>
@@ -68,17 +73,10 @@
            }else{
              this.$router.push({path:'/datamain/test'})
            }
-
         }
-
       },
       mounted(){
-          /*this.$axios.post(this.domain.ssoserverpath+"").then((reponse)=>{
-              //为data中的listMenu赋值
-              this.listMenu=reponse.data.result;
-          }).catch((error)=>{
-            console.log("===error==="+error.message);
-          })*/
+
       }
     }
 </script>

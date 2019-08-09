@@ -10,6 +10,9 @@ import system from '@/view/shouye/system'
 
 //用户列表
 import userlist from '@/view/yonghu/userlist'
+//角色列表
+import rolelist from '@/view/role/rolelist'
+
 Vue.use(Router)
 
 
@@ -37,7 +40,8 @@ export default new Router({
           component: datamain,
           children: [
             {path:'/system',component:system,meta:{require:true}},
-            {path:'/userlist',component:userlist,meta:{require:true}}
+            {path:'/userlist',component:userlist,meta:{require:true}},
+            {path:'/rolelist',component:rolelist,meta:{require:true}}
           ]
         }
       ]

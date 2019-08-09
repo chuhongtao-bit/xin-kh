@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-<!--   模糊查询   -->
+    <!--   模糊查询   -->
     <el-form :inline="true" :model="mypage" class="demo-form-inline" style="text-align: center">
 
 
@@ -15,54 +15,31 @@
 
     </el-form>
 
-    <el-button type="primary"  @click="dialogFormVisible = true">+添加新角色</el-button>
+    <el-button type="primary" @click="dialogFormVisible = true">+添加新角色</el-button>
 
 
     <!--todo 添加  -->
-    <el-dialog title="添加" :visible.sync="dialogFormVisible">
+    <el-dialog title="添加角色" :visible.sync="dialogFormVisible" :before-close="diaclose">
 
-      <el-form :model="entityUser">
+      <el-form :model="entityRole">
 
 
-        <el-form :inline="true" :model="entityUser" class="demo-form-inline">
-          <el-form-item label="用户名" :label-width="formLabelWidth">
-            <el-input v-model="entityUser.userName" autocomplete="off"></el-input>
-          </el-form-item>
-
-          <el-form-item label="登录名" :label-width="formLabelWidth">
-            <el-input v-model="entityUser.loginName" autocomplete="off"></el-input>
-          </el-form-item>
-        </el-form>
-
-        <el-form-item label="性别" :label-width="formLabelWidth">
-          <el-radio-group v-model="entityUser.sex">
-            <el-radio-button label="1">男</el-radio-button>
-            <el-radio-button label="2">女</el-radio-button>
-          </el-radio-group>
+        <el-form-item label="角色名称" :label-width="formLabelWidth">
+          <el-input v-model="entityRole.roleName" autocomplete="off"></el-input>
         </el-form-item>
 
-
-
-        <el-form-item label="密码" :label-width="formLabelWidth" >
-          <el-input type="password" v-model="entityUser.password" autocomplete="off"></el-input>
+        <el-form-item label="角色描述" :label-width="formLabelWidth">
+          <el-input type="textarea" v-model="entityRole.miaoShu" autocomplete="off"></el-input>
         </el-form-item>
-
-        <el-form-item label="确认密码" :label-width="formLabelWidth">
-          <el-input type="password" v-model="entityUser.password1" autocomplete="off"></el-input>
-        </el-form-item>
-
 
 
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false, entityUser={} ">取 消</el-button>
-        <el-button type="primary" @click="addUser(entityUser.id)">确 定</el-button>
+        <el-button @click="dialogFormVisible = false, entityRole={} ">取 消</el-button>
+        <el-button type="primary" @click="addRole(entityRole.id)">确 定</el-button>
       </div>
     </el-dialog>
-
-
-
 
 
     <!--表单-->
@@ -109,7 +86,6 @@
       </el-table-column>
 
 
-
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button
@@ -129,14 +105,14 @@
 
     <!--    分页-->
     <el-pagination style="text-align: center"
-      background
-      layout="prev,pager,next,sizes"
-      :total=total
-      :page-sizes=pageSizes
-      :page-size=pageSize
-      :current-page=currentPage
-      @current-change="nextOrOtherPage"
-      @size-change="pageSizeChange"
+                   background
+                   layout="prev,pager,next,sizes"
+                   :total=total
+                   :page-sizes=pageSizes
+                   :page-size=pageSize
+                   :current-page=currentPage
+                   @current-change="nextOrOtherPage"
+                   @size-change="pageSizeChange"
     >
     </el-pagination>
 
@@ -154,13 +130,11 @@
         pageSizes: [2, 3, 5, 10],
         pageSize: 5,
         currentPage: 1,
-        mypage: {page: "1", pageSize: "5", name:""},
+        mypage: {page: "1", pageSize: "5", name: ""},
         multipleSelection: [],
-        entityUser: {},
+        entityRole: {},
         dialogFormVisible: false,
-        formLabelWidth: '120px',
-        radio:'1'
-
+        formLabelWidth: '120px'
       }
     },
     mounted: function () {
@@ -169,7 +143,7 @@
     },
     methods: {
       getroleList() {
-        this.$axios.post(this.domain.serverpath + 'roleList',this.mypage).then((res) => {
+        this.$axios.post(this.domain.serverpath + 'roleList', this.mypage).then((res) => {
           this.roleList = res.data.list;
           this.total = res.data.total;
           this.pageSize = res.data.pageSize;
@@ -185,33 +159,26 @@
         this.mypage.pageSize = this.pageSize;
         this.getroleList();
       },
-      sexdata(sex){
-        return sex == '1' ? "男" : sex == '2' ? "女" : "数据错误";
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
       },
-      deleteById(index,row){
-        alert(JSON.stringify(index));
-        alert(JSON.stringify(row.id));
-        this.$axios.post(this.domain.serverpath + 'deleteUserById',row).then((res)=>{
-          console.log(res.data);
-          if (res.data==200){
+      deleteById(index, row) {
+        this.$axios.post(this.domain.serverpath + 'deleteRoleById', row).then((res) => {
+          if (res.data == 200) {
             this.$message({
               showClose: true,
               message: "删除成功",
               type: 'success',
-              duration:1000
+              duration: 1000
             });
             this.getroleList();
           }
         }).catch()
-
       },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-      },
-      addUser(id){
+      addRole(id){
         if(id>0){
-          this.$axios.post(this.domain.serverpath + 'updateUser', this.entityUser).then((res) => {
-            alert(JSON.stringify(this.entityUser));
+          this.$axios.post(this.domain.serverpath + 'updateUser', this.entityRole).then((res) => {
+            alert(JSON.stringify(this.entityRole));
             if (res.data==200){
               this.$message({
                 showClose: true,
@@ -219,14 +186,14 @@
                 type: 'success',
                 duration:1000
               });
-              this.getroleList();
-              this.entityUser={};
+              this.getuserList();
+              this.entityRole={};
               this.dialogFormVisible = false
             }
 
           })
         }else {
-          this.$axios.post(this.domain.serverpath + 'addUser', this.entityUser).then((res) => {
+          this.$axios.post(this.domain.serverpath + 'addRole', this.entityRole).then((res) => {
             if (res.data==200){
               this.$message({
                 showClose: true,
@@ -235,18 +202,17 @@
                 duration:1000
               });
               this.getroleList();
-              this.entityUser={};
+              this.entityRole={};
               this.dialogFormVisible = false
             }
 
           })
         }
       },
-      updateUser(index,row){
-        alert(JSON.stringify(row));
-        this.entityUser=row;
-        this.entityUser.password="";
-        this.dialogFormVisible=true;
+      diaclose(){
+        this.entityRole={};
+        this.dialogFormVisible=false;
+        this.getroleList();
       }
     }
   }

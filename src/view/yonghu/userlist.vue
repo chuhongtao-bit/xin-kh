@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-<!--   模糊查询   -->
+    <!--   模糊查询   -->
     <el-form :inline="true" :model="mypage" class="demo-form-inline" style="text-align: center">
 
 
@@ -8,23 +8,28 @@
         <el-input v-model="mypage.name" placeholder="用户名"></el-input>
       </el-form-item>
 
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="mypage.data1"
-          type="date"
-          placeholder="选择日期">
-        </el-date-picker>
----
-        <el-date-picker
-          v-model="mypage.data2"
-          type="date"
-          placeholder="选择日期">
-        </el-date-picker>
+      <el-form-item label="创建日期">
+        <div class="block">
+
+          <el-date-picker
+            v-model="mypage.data1"
+            value-format="yyyy-MM-dd"
+            type="date"
+            placeholder="选择日期">
+          </el-date-picker>
+          <el-date-picker
+            v-model="mypage.data2"
+            value-format="yyyy-MM-dd"
+            type="date"
+            placeholder="选择日期">
+          </el-date-picker>
+        </div>
+
       </el-form-item>
 
 
       <el-form-item label="性别">
-        <el-select v-model="mypage.sex" placeholder="性别" clearable=true>
+        <el-select v-model="mypage.sex" placeholder="性别" clearable>
           <el-option label="男" value="1"></el-option>
           <el-option label="女" value="2"></el-option>
         </el-select>
@@ -38,11 +43,11 @@
 
     </el-form>
 
-    <el-button type="primary"  @click="dialogFormVisible = true">+添加新用户</el-button>
+    <el-button type="primary" @click="dialogFormVisible = true">+添加新用户</el-button>
 
 
     <!--添加-->
-    <el-dialog title="添加" :visible.sync="dialogFormVisible">
+    <el-dialog title="添加" :visible.sync="dialogFormVisible" :before-close="diaclose">
 
       <el-form :model="entityUser">
 
@@ -65,15 +70,13 @@
         </el-form-item>
 
 
-
-        <el-form-item label="密码" :label-width="formLabelWidth" >
+        <el-form-item label="密码" :label-width="formLabelWidth">
           <el-input type="password" v-model="entityUser.password" autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item label="确认密码" :label-width="formLabelWidth">
           <el-input type="password" v-model="entityUser.password1" autocomplete="off"></el-input>
         </el-form-item>
-
 
 
       </el-form>
@@ -85,7 +88,30 @@
     </el-dialog>
 
 
+    <!--  绑定角色  -->
+    <div>
+      <el-dialog
+        title="绑定角色"
+        :visible.sync="bindroledia"
+        width="30%">
+        角色：
+        <template>
+          <el-select v-model="value" filterable placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </template>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="diaclose">取 消</el-button>
+        <el-button type="primary" @click="addbindRole">确 定</el-button>
+        </span>
+      </el-dialog>
 
+    </div>
 
 
     <!--表单-->
@@ -178,25 +204,27 @@
             size="mini"
             @click="updateUser(scope.$index, scope.row)">编辑
           </el-button>
-          <el-button
-            size="mini"
-            type="primary"
-            @click="handleDelete(scope.$index, scope.row)">绑定角色
+
+          <!--          绑定角色-->
+          <el-button size="mini" type="primary" @click="bindRole(scope.$index, scope.row)" v-if="scope.row.id!=pid">
+            绑定用户
           </el-button>
+
+
         </template>
       </el-table-column>
     </el-table>
 
     <!--    分页-->
     <el-pagination style="text-align: center"
-      background
-      layout="prev,pager,next,sizes"
-      :total=total
-      :page-sizes=pageSizes
-      :page-size=pageSize
-      :current-page=currentPage
-      @current-change="nextOrOtherPage"
-      @size-change="pageSizeChange"
+                   background
+                   layout="prev,pager,next,sizes"
+                   :total=total
+                   :page-sizes=pageSizes
+                   :page-size=pageSize
+                   :current-page=currentPage
+                   @current-change="nextOrOtherPage"
+                   @size-change="pageSizeChange"
     >
     </el-pagination>
 
@@ -214,13 +242,17 @@
         pageSizes: [2, 3, 5, 10],
         pageSize: 5,
         currentPage: 1,
-        mypage: {page: "1", pageSize: "5", sex:"",data1:"",data2:"",name:""},
+        mypage: {page: "1", pageSize: "5", sex: "", data1: "", data2: "", name: ""},
         multipleSelection: [],
         entityUser: {},
-        dialogFormVisible: false,
+        dialogFormVisible: false,//添加修改弹框
+        bindroledia: false,//绑定用户角色弹框
         formLabelWidth: '120px',
-        radio:'1'
-
+        radio: '1',
+        options: [],//绑定用户回显的值
+        pid: this.$store.state.userInfo.id,
+        value: '',//绑定选中角色的id
+        userId: "",//添加角色的id
       }
     },
     mounted: function () {
@@ -229,7 +261,13 @@
     },
     methods: {
       getuserList() {
-        this.$axios.post(this.domain.serverpath + 'userList',this.mypage).then((res) => {
+        if (this.mypage.data1 == null) {
+          this.mypage.data1 = '';
+        }
+        if (this.mypage.data2 == null) {
+          this.mypage.data2 = '';
+        }
+        this.$axios.post(this.domain.serverpath + 'userList', this.mypage).then((res) => {
           this.userList = res.data.list;
           this.total = res.data.total;
           this.pageSize = res.data.pageSize;
@@ -245,23 +283,23 @@
         this.mypage.pageSize = this.pageSize;
         this.getuserList();
       },
-      formatRole: function(row, column) {
+      formatRole: function (row, column) {
         return row.sex == '1' ? "男" : row.sex == '2' ? "女" : "数据错误";
       },
-      sexdata(sex){
+      sexdata(sex) {
         return sex == '1' ? "男" : sex == '2' ? "女" : "数据错误";
       },
-      deleteById(index,row){
+      deleteById(index, row) {
         alert(JSON.stringify(index));
         alert(JSON.stringify(row.id));
-        this.$axios.post(this.domain.serverpath + 'deleteUserById',row).then((res)=>{
+        this.$axios.post(this.domain.serverpath + 'deleteUserById', row).then((res) => {
           console.log(res.data);
-          if (res.data==200){
+          if (res.data == 200) {
             this.$message({
               showClose: true,
               message: "删除成功",
               type: 'success',
-              duration:1000
+              duration: 1000
             });
             this.getuserList();
           }
@@ -271,45 +309,79 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      addUser(id){
-        if(id>0){
+      addUser(id) {
+        if (id > 0) {
           this.$axios.post(this.domain.serverpath + 'updateUser', this.entityUser).then((res) => {
             alert(JSON.stringify(this.entityUser));
-            if (res.data==200){
+            if (res.data == 200) {
               this.$message({
                 showClose: true,
                 message: "修改成功",
                 type: 'success',
-                duration:1000
+                duration: 1000
               });
               this.getuserList();
-              this.entityUser={};
+              this.entityUser = {};
               this.dialogFormVisible = false
             }
 
           })
-        }else {
+        } else {
           this.$axios.post(this.domain.serverpath + 'addUser', this.entityUser).then((res) => {
-            if (res.data==200){
+            if (res.data == 200) {
               this.$message({
                 showClose: true,
                 message: "添加成功",
                 type: 'success',
-                duration:1000
+                duration: 1000
               });
               this.getuserList();
-              this.entityUser={};
+              this.entityUser = {};
               this.dialogFormVisible = false
             }
 
           })
         }
       },
-      updateUser(index,row){
+      updateUser(index, row) {
         alert(JSON.stringify(row));
-        this.entityUser=row;
-        this.entityUser.password="";
-        this.dialogFormVisible=true;
+        this.entityUser = row;
+        this.entityUser.password = "";
+        this.dialogFormVisible = true;
+      },
+      diaclose() {
+        this.entityUser = {};
+        this.dialogFormVisible = false;
+        this.bindroledia = false;
+        this.getuserList();
+        this.value = '';
+      },
+      bindRole(index, row) {
+        this.userId = row.id;
+        this.bindroledia = true;
+        this.$axios.post(this.domain.serverpath + "bdrolelist").then((res) => {
+          this.options = res.data;
+        })
+      },
+      addbindRole() {
+        alert("用户id" + this.userId);
+        alert("角色id" + this.value);
+
+        this.$axios.post(this.domain.serverpath + "adduserRole",{userId:this.userId,roleId:this.value}).then((res) => {
+          if(res.data==200){
+            this.$message({
+              showClose: true,
+              message: "绑定成功",
+              type: 'success',
+              duration: 1000
+            });
+            this.getuserList();
+
+            this.bindroledia = false;
+          }
+        }).catch()
+        this.value = '';
+
       }
     }
   }

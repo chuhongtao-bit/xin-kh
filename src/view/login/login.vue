@@ -137,7 +137,7 @@
               //存储token到vuex中，
               this.$store.state.token=response.data.token
               this.$store.state.userInfo=response.data.result
-             //todo 注释掉
+             //todo 使用全局没用session
               // window.sessionStorage.setItem("userInfo",JSON.stringify(response.data.result))
               //关闭加载窗
               this.$data.percent=100

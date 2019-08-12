@@ -117,7 +117,7 @@
     <el-table
       :data="userList"
       style="width: 100%"
-      :default-sort="{prop: 'id', order: 'descending'}"
+      :default-sort="{prop: 'id', order: 'ascending'}"
 
       ref="multipleTable"
       tooltip-effect="dark"
@@ -147,7 +147,6 @@
       </el-table-column>
 
       <el-table-column
-
         prop="loginName"
         label="登录名"
         sortable
@@ -307,8 +306,9 @@
             });
             this.getuserList();
           }
-        }).catch()
+        }).catch(
 
+        )
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
@@ -328,23 +328,43 @@
               this.entityUser = {};
               this.dialogFormVisible = false
             }
-
           })
         } else {
-          this.$axios.post(this.domain.serverpath + 'addUser', this.entityUser).then((res) => {
-            if (res.data == 200) {
-              this.$message({
-                showClose: true,
-                message: "添加成功",
-                type: 'success',
-                duration: 1000
-              });
-              this.getuserList();
-              this.entityUser = {};
-              this.dialogFormVisible = false
-            }
+          if (this.entityUser.userName == null) {
+            alert("用户名不能为空");
+          } else if (this.entityUser.loginName == null) {
+            alert("登录名不能为空");
+          }else if(this.entityUser.sex == null){
+            alert("请选择性别");
+          }else if(this.entityUser.password == null){
+            alert("请输入密码");
+          }else if(this.entityUser.password1 == null){
+            alert("请再次输入密码");
+          } else if(this.entityUser.password!==this.entityUser.password1){
+            alert("两次密码输入不一致");
+          } else {
+            this.$axios.post(this.domain.serverpath + 'addUser', this.entityUser).then((res) => {
 
-          })
+              if (res.data == 200) {
+                this.$message({
+                  showClose: true,
+                  message: "添加成功",
+                  type: 'success',
+                  duration: 1000
+                });
+                this.getuserList();
+                this.entityUser = {};
+                this.dialogFormVisible = false
+              }else if(res.data == 505){
+                alert("登录名重复");
+              }
+
+            }).catch(
+
+            )
+          }
+
+
         }
       },
       updateUser(index, row) {
@@ -371,8 +391,11 @@
         alert("用户id" + this.userId);
         alert("角色id" + this.value);
 
-        this.$axios.post(this.domain.serverpath + "adduserRole",{userId:this.userId,roleId:this.value}).then((res) => {
-          if(res.data==200){
+        this.$axios.post(this.domain.serverpath + "adduserRole", {
+          userId: this.userId,
+          roleId: this.value
+        }).then((res) => {
+          if (res.data == 200) {
             this.$message({
               showClose: true,
               message: "绑定成功",

@@ -18,11 +18,10 @@
     <el-button type="primary" @click="dialogFormVisible = true">+添加新角色</el-button>
 
 
-    <!--todo 添加  -->
+    <!-- 添加  -->
     <el-dialog title="添加角色" :visible.sync="dialogFormVisible" :before-close="diaclose">
 
       <el-form :model="entityRole">
-
 
         <el-form-item label="角色名称" :label-width="formLabelWidth">
           <el-input v-model="entityRole.roleName" autocomplete="off"></el-input>
@@ -32,7 +31,6 @@
           <el-input type="textarea" v-model="entityRole.miaoShu" autocomplete="off"></el-input>
         </el-form-item>
 
-
       </el-form>
 
       <div slot="footer" class="dialog-footer">
@@ -40,6 +38,42 @@
         <el-button type="primary" @click="addRole(entityRole.id)">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!--  绑定权限  -->
+    <div>
+      <el-dialog
+        title="编辑角色"
+        :visible.sync="bindusermenu"
+        width="40%"
+        :before-close="diaclose">
+        <el-form label-width="100px" ref="entitymod" :model="entityRole">
+
+          <el-form-item label="角色名称">
+            <el-input type="text" v-model="entityRole.roleName" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="角色描述">
+            <el-input type="text" v-model="entityRole.miaoShu" autocomplete="off"></el-input>
+          </el-form-item>
+
+        </el-form>
+        权限列表信息
+        <el-tree
+          :data="menudata"
+          show-checkbox
+          default-expand-all
+          node-key="id"
+          ref="tree"
+          highlight-current
+
+          :props="defaultProps">
+        </el-tree>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="diaclose">取 消</el-button>
+          <el-button type="primary" @click="getCheckedKeys">确 定</el-button>
+        </span>
+      </el-dialog>
+
+    </div>
 
 
     <!--表单-->
@@ -93,10 +127,11 @@
             type="danger"
             @click="deleteById(scope.$index, scope.row)">删除
           </el-button>
+
           <el-button
             size="mini"
             type="primary"
-            @click="updateUser(scope.$index, scope.row)">编辑绑定权限
+            @click="updateRole(scope.$index, scope.row)">编辑绑定权限
           </el-button>
 
         </template>
@@ -134,19 +169,32 @@
         multipleSelection: [],
         entityRole: {},
         dialogFormVisible: false,
-        formLabelWidth: '120px'
+        bindusermenu: false,
+        formLabelWidth: '120px',
+        menudata: [],//角色权限回显
+        defaultProps: {
+          children: 'menuInfoList',
+          label: 'menuName'
+        }
       }
     },
     mounted: function () {
       console.log("vue开始了");
       this.getroleList();
+      //获取角色权限回显
+      this.$axios.post(this.domain.serverpath + "findMenu").then((res) => {
+        this.menudata = res.data;
+      })
+
     },
     methods: {
       getroleList() {
+        if (this.mypage.name == null) {
+          this.mypage.name = '';
+        }
         this.$axios.post(this.domain.serverpath + 'roleList', this.mypage).then((res) => {
-          this.roleList = res.data.list;
-          this.total = res.data.total;
-          this.pageSize = res.data.pageSize;
+          this.roleList = res.data.content;
+          this.total = res.data.totalElements;
         }).catch()
       },
       nextOrOtherPage(currentPage) {
@@ -175,44 +223,85 @@
           }
         }).catch()
       },
-      addRole(id){
-        if(id>0){
+      addRole(id) {
+        if (id > 0) {
           this.$axios.post(this.domain.serverpath + 'updateUser', this.entityRole).then((res) => {
             alert(JSON.stringify(this.entityRole));
-            if (res.data==200){
+            if (res.data == 200) {
               this.$message({
                 showClose: true,
                 message: "修改成功",
                 type: 'success',
-                duration:1000
+                duration: 1000
               });
               this.getuserList();
-              this.entityRole={};
+              this.entityRole = {};
               this.dialogFormVisible = false
             }
 
           })
-        }else {
+        } else {
           this.$axios.post(this.domain.serverpath + 'addRole', this.entityRole).then((res) => {
-            if (res.data==200){
+            if (res.data == 200) {
               this.$message({
                 showClose: true,
                 message: "添加成功",
                 type: 'success',
-                duration:1000
+                duration: 1000
               });
               this.getroleList();
-              this.entityRole={};
+              this.entityRole = {};
               this.dialogFormVisible = false
             }
 
           })
         }
       },
-      diaclose(){
-        this.entityRole={};
-        this.dialogFormVisible=false;
-        this.getroleList();
+      diaclose() {
+        this.entityRole = {};
+        this.dialogFormVisible = false;
+        this.bindusermenu = false;
+      },//点击角色绑定权限
+      updateRole(index, row) {
+        this.entityRole = row;
+        this.bindusermenu = true;
+
+        setTimeout(()=>{
+          this.$refs.tree.setCheckedNodes(row.menuInfoList.filter(i=>i.leval == 4));
+        },0)
+      },//角色绑定权限
+      getCheckedKeys() {
+        let k1=this.$refs.tree.getCheckedKeys()
+        let k2=this.$refs.tree.getHalfCheckedKeys();
+        let k3=[];
+        k3=k3.concat(k1).concat(k2);
+
+        this.entityRole.ids=k3;
+
+        this.$axios.post(this.domain.serverpath+"addRm",this.entityRole).then((res)=>{
+
+          if(res.code=200){
+            this.$message({
+              message: '恭喜你，绑定成功',
+              type: 'success',
+              duration:'1000'
+            });
+            this.bindusermenu=false;
+            this.getroleList();
+          }else{
+            this.$message({
+              message: '绑定失败',
+              type: 'error',
+              duration:'1000'
+            });
+          }
+        }).catch((x)=>{
+          this.$message({
+            message: '你没有操作权限',
+            type: 'error',
+            duration:'1000'
+          });
+        })
       }
     }
   }

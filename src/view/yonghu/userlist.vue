@@ -110,7 +110,6 @@
         <el-button type="primary" @click="addbindRole">确 定</el-button>
         </span>
       </el-dialog>
-
     </div>
 
 
@@ -256,7 +255,7 @@
       }
     },
     mounted: function () {
-      console.log("vue开始了");
+      console.log("进入用户列表");
       this.getuserList();
     },
     methods: {
@@ -267,10 +266,15 @@
         if (this.mypage.data2 == null) {
           this.mypage.data2 = '';
         }
+        if (this.mypage.sex == null) {
+          this.mypage.sex = '';
+        }
+        if (this.mypage.name == null) {
+          this.mypage.name = '';
+        }
         this.$axios.post(this.domain.serverpath + 'userList', this.mypage).then((res) => {
-          this.userList = res.data.list;
-          this.total = res.data.total;
-          this.pageSize = res.data.pageSize;
+          this.userList = res.data.content;
+          this.total = res.data.totalElements;
         }).catch()
       },
       nextOrOtherPage(currentPage) {

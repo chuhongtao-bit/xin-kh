@@ -205,7 +205,7 @@
 
           <!--          绑定角色-->
           <el-button size="mini" type="primary" @click="bindRole(scope.$index, scope.row)" v-if="scope.row.id!=pid">
-            绑定用户
+            绑定角色
           </el-button>
 
 
@@ -306,8 +306,13 @@
             });
             this.getuserList();
           }
-        }).catch(
-
+        }).catch((x) => {
+            this.$message({
+              message: '未有操作权限',
+              type: 'error',
+              duration: '1000'
+            });
+          }
         )
       },
       handleSelectionChange(val) {
@@ -328,19 +333,25 @@
               this.entityUser = {};
               this.dialogFormVisible = false
             }
+          }).catch((x) => {
+            this.$message({
+              message: '未有操作权限',
+              type: 'error',
+              duration: '1000'
+            });
           })
         } else {
           if (this.entityUser.userName == null) {
             alert("用户名不能为空");
           } else if (this.entityUser.loginName == null) {
             alert("登录名不能为空");
-          }else if(this.entityUser.sex == null){
+          } else if (this.entityUser.sex == null) {
             alert("请选择性别");
-          }else if(this.entityUser.password == null){
+          } else if (this.entityUser.password == null) {
             alert("请输入密码");
-          }else if(this.entityUser.password1 == null){
+          } else if (this.entityUser.password1 == null) {
             alert("请再次输入密码");
-          } else if(this.entityUser.password!==this.entityUser.password1){
+          } else if (this.entityUser.password !== this.entityUser.password1) {
             alert("两次密码输入不一致");
           } else {
             this.$axios.post(this.domain.serverpath + 'addUser', this.entityUser).then((res) => {
@@ -355,12 +366,17 @@
                 this.getuserList();
                 this.entityUser = {};
                 this.dialogFormVisible = false
-              }else if(res.data == 505){
+              } else if (res.data == 505) {
                 alert("登录名重复");
               }
 
-            }).catch(
-
+            }).catch((x) => {
+                this.$message({
+                  message: '未有操作权限',
+                  type: 'error',
+                  duration: '1000'
+                });
+              }
             )
           }
 
@@ -385,6 +401,12 @@
         this.bindroledia = true;
         this.$axios.post(this.domain.serverpath + "bdrolelist").then((res) => {
           this.options = res.data;
+        }).catch((x)=>{
+          this.$message({
+            message: '未有操作权限',
+            type: 'error',
+            duration:'1000'
+          });
         })
       },
       addbindRole() {
@@ -406,7 +428,15 @@
 
             this.bindroledia = false;
           }
-        }).catch()
+        }).catch(
+          (x)=>{
+            this.$message({
+              message: '未有操作权限',
+              type: 'error',
+              duration:'1000'
+            });
+          }
+        )
         this.value = '';
 
       }

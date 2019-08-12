@@ -125,7 +125,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="deleteById(scope.$index, scope.row)">删除
+            @click="deleteroleById(scope.$index, scope.row)">删除
           </el-button>
 
           <el-button
@@ -179,7 +179,7 @@
       }
     },
     mounted: function () {
-      console.log("vue开始了");
+      console.log("进入角色列表");
       this.getroleList();
       //获取角色权限回显
       this.$axios.post(this.domain.serverpath + "findMenu").then((res) => {
@@ -195,7 +195,9 @@
         this.$axios.post(this.domain.serverpath + 'roleList', this.mypage).then((res) => {
           this.roleList = res.data.content;
           this.total = res.data.totalElements;
-        }).catch()
+        }).catch(
+
+        )
       },
       nextOrOtherPage(currentPage) {
         this.mypage.pageSize = this.pageSize;
@@ -210,7 +212,7 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      deleteById(index, row) {
+      deleteroleById(index, row) {
         this.$axios.post(this.domain.serverpath + 'deleteRoleById', row).then((res) => {
           if (res.data == 200) {
             this.$message({
@@ -221,7 +223,9 @@
             });
             this.getroleList();
           }
-        }).catch()
+        }).catch(
+
+        )
       },
       addRole(id) {
         if (id > 0) {
@@ -239,6 +243,12 @@
               this.dialogFormVisible = false
             }
 
+          }).catch((x)=>{
+            this.$message({
+              message: '未有操作权限',
+              type: 'error',
+              duration:'1000'
+            });
           })
         } else {
           this.$axios.post(this.domain.serverpath + 'addRole', this.entityRole).then((res) => {
@@ -254,6 +264,12 @@
               this.dialogFormVisible = false
             }
 
+          }).catch((x)=>{
+            this.$message({
+              message: '未有操作权限',
+              type: 'error',
+              duration:'1000'
+            });
           })
         }
       },
